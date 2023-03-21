@@ -2,8 +2,8 @@
     GD50 2018
     Pong Remake
     
-    pong-1
-    "The Low-Res Update"
+    pong-2
+    "The Rectangle Update"
     
     -- Main Program --
     Author: Colton Ogden
@@ -35,12 +35,17 @@ VIRTUAL_HEIGHT = 243
 ]]
 function love.load()
     -- use nearest-neighbor filtering on upscaling and downscaling to prevent blurring of text 
-    -- and graphics; try removing this function to see the difference!
+    -- and graphics;
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
+    -- more "retro-looking" font object we can use for any text
+    smallFont = love.graphics.newFont('font.ttf', 8)
+
+    -- set LÖVE2D's active font to the smallFont obect
+    love.graphics.setFont(smallFont)
+
     -- initialize our virtual resolution, which will be rendered within our
-    -- actual window no matter its dimensions; replaces our love.window.setMode call
-    -- from the last example
+    -- actual window no matter its dimensions; 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
         resizable = false,
