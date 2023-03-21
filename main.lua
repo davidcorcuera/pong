@@ -73,13 +73,26 @@ function love.draw()
     -- begin rendering at virtual resolution
     push:apply('start')
 
-    -- note we are now using virtual width and height now for text placement
-    love.graphics.printf(
-        'Hello Pong!',          -- text to render
-        0,                      -- starting X (0 since we're going to center it based on width)
-        VIRTUAL_HEIGHT / 2 - 6,  -- starting Y (halfway down the screen)
-        VIRTUAL_WIDTH,           -- number of pixels to center within (the entire screen here)
-        'center')               -- alignment mode, can be 'center', 'left', or 'right'
+    -- clear the screen with a specific color; in this case, a color similar
+    -- to some versions of the original Pong
+    love.graphics.clear(40/255, 45/255, 52/255, 255/255)
+
+    -- draw welcome text toward the top of the screen
+    love.graphics.printf('Hello Pong!', 0, 20, VIRTUAL_WIDTH, 'center')
+
+    --
+    -- paddles are simply rectangles we draw on the screen at certain points,
+    -- as is the ball
+    --
+
+    -- render first paddle (left side)
+    love.graphics.rectangle('fill', 10, 30, 5, 20)
+
+    -- render second paddle (right side)
+    love.graphics.rectangle('fill', VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 50, 5, 20)
+
+    -- render ball (center)
+    love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
     
     -- end rendering at virtual resolution
     push:apply('end')
