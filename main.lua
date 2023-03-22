@@ -94,19 +94,24 @@ function love.update(dt)
     -- player 1 movement
     if love.keyboard.isDown('w') then
         -- add negative paddle speed to current Y scaled by deltaTime
-        player1Y = player1Y + -PADDLE_SPEED * dt
+        -- now, we clamp our position between the bounds of the screen
+        -- math.max returns the greater of two values; 0 and player Y
+        -- will ensure we don't go above it
+        player1Y = math.max(0, player1Y + -PADDLE_SPEED * dt)
     elseif love.keyboard.isDown('s') then
         -- add positive paddle speed to current Y scaled by deltaTime
-        player1Y = player1Y + PADDLE_SPEED * dt
+        -- math.min returns the lesser of two values; bottom of the egde minus paddle height
+        -- and player Y will ensure we don't go below it
+        player1Y = math.min(VIRTUAL_HEIGHT - 20, player1Y + PADDLE_SPEED * dt)
     end
 
     -- player 2 movement
     if love.keyboard.isDown('up') then
         -- add negative paddle speed to current Y scaled by deltaTime
-        player2Y = player2Y + -PADDLE_SPEED * dt
+        player2Y = math.max(0, player2Y + -PADDLE_SPEED * dt)
     elseif love.keyboard.isDown('down') then
         -- add positive paddle speed to current Y scaled by deltaTime
-        player2Y = player2Y + PADDLE_SPEED * dt
+        player2Y = math.min(VIRTUAL_HEIGHT - 20, player2Y + PADDLE_SPEED * dt)
     end
 
     -- update our ball based on its DX and DY only if we're in play state;
