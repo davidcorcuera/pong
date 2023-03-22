@@ -2,9 +2,9 @@
     GD50 2018
     Pong Remake
     
-    pong-4
-    "The Class Update"
-    
+    pong-6
+    "The FPS Update"
+
     -- Main Program --
     Author: Colton Ogden
     cogden@cs50.harvard.edu
@@ -55,6 +55,9 @@ function love.load()
     -- use nearest-neighbor filtering on upscaling and downscaling to prevent blurring of text 
     -- and graphics;
     love.graphics.setDefaultFilter('nearest', 'nearest')
+    
+    -- set the title of our application window
+    love.window.setTitle('Pong')
 
     -- "seed" the RNG so that calls to random are always random
     -- use the current time, since that will vary on startup every time
@@ -194,6 +197,6 @@ function love.draw()
     -- render ball using its class's render method
     ball:render()
     -- end rendering at virtual resolution
-    
+
     push:apply('end')
 end
