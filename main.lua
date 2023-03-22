@@ -2,8 +2,8 @@
     GD50 2018
     Pong Remake
     
-    pong-2
-    "The Rectangle Update"
+    pong-4
+    "The Ball Update"
     
     -- Main Program --
     Author: Colton Ogden
@@ -41,6 +41,10 @@ function love.load()
     -- and graphics;
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
+    -- "seed" the RNG so that calls to random are always random
+    -- use the current time, since that will vary on startup every time
+    math.randomseed(os.time())
+
     -- more "retro-looking" font object we can use for any text
     smallFont = love.graphics.newFont('font.ttf', 8)
 
@@ -67,6 +71,19 @@ function love.load()
     player1Y = 30
     player2Y = VIRTUAL_HEIGHT - 50
 
+    -- velocity and position variables for our ball when play starts
+    ballX = VIRTUAL_WIDTH / 2 - 2
+    ballY = VIRTUAL_HEIGHT / 2 - 2
+
+    -- math.random returns a random value between the left and right number
+    ballDX = math.random(2) == 1 and 100 or -100
+    ballDY = math.random(-50, 50)
+
+    -- game state variable used to transition between different parts of the game
+    -- (used for beginning, menus, main game, high score list, etc.)
+    -- we will use this to determine behavior during render and update
+    gameState = 'start'
+
 end
 
 --[[
@@ -91,6 +108,14 @@ function love.update(dt)
         -- add positive paddle speed to current Y scaled by deltaTime
         player2Y = player2Y + PADDLE_SPEED * dt
     end
+
+    -- update our ball based on its DX and DY only if we're in play state;
+    -- scale the velocity by dt so movement is framerate-independent
+    if gameState == 'play' then
+        ballX = ballX + ballDX * dt
+        ballY = ballY + ballDY * dt
+    end
+
 end
 
 --[[
@@ -103,6 +128,24 @@ function love.keypressed(key)
     if key == 'escape' then
         -- function LÖVE gives us to terminate application
         love.event.quit()
+    -- if we press enter during the start state of the game, we'll go into play mode
+    -- during play mode, the ball will move in a random direction
+    elseif key == 'enter' or key == 'return' then
+        if gameState == 'start' then
+            gameState = 'play'
+        else
+            gameState = 'start'
+            
+            -- start ball's position in the middle of the screen
+            ballX = VIRTUAL_WIDTH / 2 - 2
+            ballY = VIRTUAL_HEIGHT / 2 - 2
+
+            -- given ball's x and y velocity a random starting value
+            -- the and/or pattern here is Lua's way of accomplishing a ternary operation
+            -- in other programming languages like C
+            ballDX = math.random(2) == 1 and 100 or -100
+            ballDY = math.random(-50, 50) * 1.5
+        end
     end
 end
 
@@ -118,9 +161,14 @@ function love.draw()
     -- to some versions of the original Pong
     love.graphics.clear(40/255, 45/255, 52/255, 255/255)
 
-    -- draw welcome text toward the top of the screen
+    -- draw different things based on the state of the game
     love.graphics.setFont(smallFont)
-    love.graphics.printf('Hello Pong!', 0, 20, VIRTUAL_WIDTH, 'center')
+
+    if gameState == 'start' then
+        love.graphics.printf('Hello Start State!', 0, 20, VIRTUAL_WIDTH, 'center')
+    else
+        love.graphics.printf('Hello Play State!', 0, 20, VIRTUAL_WIDTH, 'center')
+    end
 
     -- draw score on the left and right center of the screen
     -- need to switch font to draw before actually printing
@@ -140,7 +188,7 @@ function love.draw()
     love.graphics.rectangle('fill', VIRTUAL_WIDTH - 10, player2Y, 5, 20)
 
     -- render ball (center)
-    love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
+    love.graphics.rectangle('fill', ballX, ballY, 4, 4)
     
     -- end rendering at virtual resolution
     push:apply('end')
