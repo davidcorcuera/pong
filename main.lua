@@ -1,9 +1,9 @@
 --[[
     GD50 2018
     Pong Remake
-    
-    pong-7
-    "The Collision Update"
+
+    pong-8
+    "The Score Update"
 
     -- Main Program --
     Author: Colton Ogden
@@ -13,10 +13,9 @@
     the ball past your opponent's edge. First to 10 points wins.
     This version is built to more closely resemble the NES than
     the original Pong machines or the Atari 2600 in terms of
-    resolution, though in widescreen (16:9) so it looks nicer on 
+    resolution, though in widescreen (16:9) so it looks nicer on
     modern systems.
 ]]
-
 -- push is a library that will allow us to draw our game at a virtual
 -- resolution, instead of however large our window is; used to provide
 -- a more retro aesthetic
@@ -52,10 +51,10 @@ PADDLE_SPEED = 200
     Runs when the game first starts up, only once; used to initialize the game.
 ]]
 function love.load()
-    -- use nearest-neighbor filtering on upscaling and downscaling to prevent blurring of text 
+    -- use nearest-neighbor filtering on upscaling and downscaling to prevent blurring of text
     -- and graphics;
     love.graphics.setDefaultFilter('nearest', 'nearest')
-    
+
     -- set the title of our application window
     love.window.setTitle('Pong')
 
@@ -73,7 +72,7 @@ function love.load()
     love.graphics.setFont(smallFont)
 
     -- initialize our virtual resolution, which will be rendered within our
-    -- actual window no matter its dimensions; 
+    -- actual window no matter its dimensions;
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
         resizable = false,
@@ -97,15 +96,13 @@ function love.load()
     -- (used for beginning, menus, main game, high score list, etc.)
     -- we will use this to determine behavior during render and update
     gameState = 'start'
-
 end
 
 --[[
-    Runs every frame, with "dt" passed in, our delta in seconds 
+    Runs every frame, with "dt" passed in, our delta in seconds
     since the last frame, which LÖVE2D supplies us.
 ]]
 function love.update(dt)
-
     if gameState == 'play' then
         -- detect ball collision with paddles, reversing dx if true and
         -- slightly increasing it, then altering the dy based on the position of collision
@@ -143,8 +140,24 @@ function love.update(dt)
             ball.y = VIRTUAL_HEIGHT - 4
             ball.dy = -ball.dy
         end
+
+        -- if we reach the left or right edge of the screen,
+        -- go back to start and update the score
+        if ball.x < 0 then
+            servingPlayer = 1
+            player2Score = player2Score + 1
+            ball:reset()
+            gameState = 'start'
+        end
+
+        if ball.x > VIRTUAL_WIDTH then
+            servingPlayer = 2
+            player1Score = player1Score + 1
+            ball:reset()
+            gameState = 'start'
+        end
     end
-    
+
     -- player 1 movement
     if love.keyboard.isDown('w') then
         player1.dy = -PADDLE_SPEED
@@ -160,7 +173,7 @@ function love.update(dt)
     elseif love.keyboard.isDown('down') then
         player2.dy = PADDLE_SPEED
     else
-        player2.dy = 0    
+        player2.dy = 0
     end
 
     -- update our ball based on its DX and DY only if we're in play state;
@@ -171,33 +184,30 @@ function love.update(dt)
 
     player1:update(dt)
     player2:update(dt)
-
 end
 
 --[[
-    Keyboard handling, called by LÖVE2D each frame; 
+    Keyboard handling, called by LÖVE2D each frame;
     passes in the key we pressed so we can access.
 ]]
-
 function love.keypressed(key)
     -- keys can be accessed by string name
     if key == 'escape' then
         -- function LÖVE gives us to terminate application
         love.event.quit()
-    -- if we press enter during the start state of the game, we'll go into play mode
-    -- during play mode, the ball will move in a random direction
+        -- if we press enter during the start state of the game, we'll go into play mode
+        -- during play mode, the ball will move in a random direction
     elseif key == 'enter' or key == 'return' then
         if gameState == 'start' then
             gameState = 'play'
         else
             gameState = 'start'
-            
+
             -- ball's new reset method
             ball:reset()
         end
     end
 end
-
 
 --[[
     Called after update by LÖVE2D, used to draw anything to the screen, updated or otherwise.
@@ -208,7 +218,7 @@ function love.draw()
 
     -- clear the screen with a specific color; in this case, a color similar
     -- to some versions of the original Pong
-    love.graphics.clear(40/255, 45/255, 52/255, 255/255)
+    love.graphics.clear(40 / 255, 45 / 255, 52 / 255, 255 / 255)
 
     -- draw different things based on the state of the game
     love.graphics.setFont(smallFont)
@@ -250,6 +260,6 @@ end
 function displayFPS()
     -- simple FPS display across all states
     love.graphics.setFont(smallFont)
-    love.graphics.setColor(0, 255/255, 0, 255/255)
+    love.graphics.setColor(0, 255 / 255, 0, 255 / 255)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
 end
