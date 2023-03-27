@@ -99,7 +99,7 @@ function love.load()
 
     -- initialize our player paddles; make them global so that they can be
     -- detected by other functions and modules
-    player1 = Paddle(10, 30, 5, 20)
+    player1 = Paddle(10, VIRTUAL_HEIGHT / 2 - 10, 5, 20)
     player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
 
     -- place a ball in the middle of the screen
@@ -128,7 +128,6 @@ function love.update(dt)
     if gameState == 'serve' then
         -- before switching to play, initialize ball's velocity based
         -- on player who last scored
-        ball.dy = math.random(-50, 50)
         if servingPlayer == 1 then
             ball.dx = math.random(140, 200)
         else
@@ -192,8 +191,9 @@ function love.update(dt)
                 gameState = 'done'
             else
                 gameState = 'serve'
-                -- places the ball in the middle of the screen, no velocity
+                -- places the ball and left paddle in the middle of the screen, no velocity
                 ball:reset()
+                player1:reset()
             end
         end
 
@@ -209,21 +209,17 @@ function love.update(dt)
                 gameState = 'done'
             else
                 gameState = 'serve'
-                -- places the ball in the middle of the screen, no velocity
+                -- places the ball and the left paddle in the middle of the screen, no velocity
                 ball:reset()
+                player1:reset()
             end
         end
-    end
 
-    -- player 1 movement
-    if love.keyboard.isDown('w') then
-        player1.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('s') then
-        player1.dy = PADDLE_SPEED
-    else
-        player1.dy = 0
-    end
+        -- player 1 IA movement
+        player1.dy = ball.dy
 
+    end
+    
     -- player 2 movement
     if love.keyboard.isDown('up') then
         player2.dy = -PADDLE_SPEED
@@ -239,8 +235,12 @@ function love.update(dt)
         ball:update(dt)
     end
 
-    player1:update(dt)
     player2:update(dt)
+
+    if gameState == 'play' then 
+        player1:update(dt)
+    end
+        
 end
 
 --[[
